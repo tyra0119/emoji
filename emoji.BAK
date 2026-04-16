@@ -140,28 +140,6 @@
       image-rendering: high-quality;
     }
 
-    /* ホバー時オーバーレイ: JSで visibility を切り替える */
-    .img-wrapper img.img-hover {
-      display: block;
-      visibility: hidden;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 200px;
-      height: 200px;
-      object-fit: contain;
-      z-index: 101;
-      image-rendering: high-quality;
-      border: 1px solid #c0392b;
-      border-radius: 4px;
-      background: #0a0608;
-      box-shadow:
-        0 0 16px rgba(192, 57, 43, 0.9),
-        0 0 32px rgba(192, 57, 43, 0.4),
-        0 4px 20px rgba(0,0,0,0.9);
-      pointer-events: none;
-    }
 
     .img-wrapper .img-num {
       width: 100%;
@@ -171,7 +149,7 @@
       background: rgba(0,0,0,0.85);
       color: #c8a96e;
       padding: 2px 0;
-      line-height: 1.4;
+      line-height: 1.2;
       font-family: 'Cinzel', monospace;
       pointer-events: none;
       flex-shrink: 0;
@@ -205,9 +183,156 @@
     ::-webkit-scrollbar-track { background: #0a0608; }
     ::-webkit-scrollbar-thumb { background: #5a1a1a; border-radius: 3px; }
     ::-webkit-scrollbar-thumb:hover { background: #8b1a1a; }
+
+    /* ★ お気に入りセクション */
+    #favorites-section {
+      max-width: 1800px;
+      margin: 0 auto 10px;
+    }
+
+    #favorites-section .fav-title {
+      font-family: 'Cinzel', serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: #f5d76e;
+      text-align: center;
+      margin-bottom: 8px;
+      filter: drop-shadow(0 0 6px rgba(245, 215, 110, 0.5));
+    }
+
+    #favorites-empty {
+      text-align: center;
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      color: #3a2a10;
+      font-family: 'Cinzel', serif;
+      padding: 10px 0 4px;
+    }
+
+    #favorites-gallery {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      justify-content: flex-start;
+      padding: 12px 16px;
+      background: rgba(10, 4, 8, 0.8);
+      border: 1px solid #5a3a10;
+      border-radius: 4px;
+      box-shadow:
+        inset 0 0 30px rgba(0, 0, 0, 0.5),
+        0 0 16px rgba(200, 160, 48, 0.08);
+      min-height: 54px;
+    }
+
+    .fav-item {
+    width: 100px;
+    height: 130px;
+    position: relative;
+    border: 1px solid #3a1515;
+    border-radius: 3px;
+    overflow: visible;
+    background: #120608;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.8);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    }
+
+    .fav-item:hover {
+      border-color: #f5d76e;
+      box-shadow: 0 0 8px rgba(245, 215, 110, 0.5);
+    }
+
+    .fav-item img {
+      width: 100px;
+      height: 100px;
+      object-fit: contain;
+      display: block;
+      flex-shrink: 0;
+    }
+
+    .fav-item .fav-num {
+      width: 100%;
+      text-align: center;
+      font-size: 20px;
+      font-weight: bold;
+      background: rgba(0,0,0,0.85);
+      color: #c8a96e;
+      padding: 2px 0;
+      line-height: 1.2;
+      font-family: 'Cinzel', monospace;
+      flex-shrink: 0;
+    }
+
+    /* ☆/★ ボタン */
+    .star-btn {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      font-size: 13px;
+      line-height: 1;
+      color: #5a4a20;
+      background: rgba(0,0,0,0.6);
+      border: none;
+      border-radius: 2px;
+      padding: 1px 2px;
+      cursor: pointer;
+      z-index: 102;
+      transition: color 0.15s, text-shadow 0.15s;
+      pointer-events: all;
+    }
+
+    .star-btn:hover {
+      color: #f5d76e;
+      text-shadow: 0 0 6px rgba(245, 215, 110, 0.8);
+    }
+
+    .star-btn.active {
+      color: #f5d76e;
+      text-shadow: 0 0 8px rgba(245, 215, 110, 0.9);
+    }
+
+    /* コピー通知トースト */
+    #toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: rgba(10, 4, 8, 0.95);
+      border: 1px solid #c0392b;
+      color: #c8a96e;
+      font-family: 'Cinzel', serif;
+      font-size: 0.85rem;
+      letter-spacing: 0.15em;
+      padding: 10px 24px;
+      border-radius: 4px;
+      box-shadow: 0 0 16px rgba(192, 57, 43, 0.6), 0 4px 20px rgba(0,0,0,0.9);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      white-space: nowrap;
+      z-index: 9999;
+    }
+    #toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
   </style>
 </head>
 <body>
+
+<div id="toast"></div>
+
+<!-- お気に入りセクション -->
+<div id="favorites-section">
+  <div class="fav-title">★ お気に入り ★</div>
+  <div id="favorites-gallery">
+    <div id="favorites-empty">お気に入りはまだありません</div>
+  </div>
+</div>
 
 <header>
   <h1>Diablo Immortal Emoji</h1>
@@ -233,7 +358,87 @@
 <script>
   const gallery = document.getElementById('gallery');
   const countDisplay = document.getElementById('count-display');
+  const toast = document.getElementById('toast');
+  const favGallery = document.getElementById('favorites-gallery');
+  const favEmpty = document.getElementById('favorites-empty');
+  const favorites = new Map(); // key: i, value: fav-item element
+  const FAV_KEY = 'diablo_emoji_favorites';
+  const savedFavs = new Set(JSON.parse(localStorage.getItem(FAV_KEY) || '[]'));
+  const stars = new Map(); // key: i, value: star button element
   let loaded = 0;
+  let toastTimer = null;
+
+  function showToast(text) {
+    toast.textContent = text;
+    toast.classList.add('show');
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 2000);
+  }
+
+  function saveFavs() {
+    localStorage.setItem(FAV_KEY, JSON.stringify([...favorites.keys()].sort((a,b)=>a-b)));
+  }
+
+  function addFavorite(i, src) {
+    if (favorites.has(i)) return;
+    favEmpty.style.display = 'none';
+
+    const item = document.createElement('div');
+    item.className = 'fav-item';
+    item.title = `#${i}`;
+
+    const img = document.createElement('img');
+    img.src = src;
+    img.alt = `${i}`;
+
+    const num = document.createElement('span');
+    num.className = 'fav-num';
+    num.textContent = i;
+
+    item.appendChild(img);
+    item.appendChild(num);
+
+    // お気に入りの画像をクリックしてもコピーできる
+    item.addEventListener('click', () => {
+      const text = `[bigEmoji:${i}]`;
+      navigator.clipboard.writeText(text).then(() => {
+        showToast(`📋 コピーしました： ${text}`);
+      }).catch(() => {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        showToast(`📋 コピーしました： ${text}`);
+      });
+    });
+
+    // 番号順で挿入
+    let inserted = false;
+    for (const node of favGallery.children) {
+      if (node === favEmpty) continue;
+      if (parseInt(node.title.replace('#','')) > i) {
+        favGallery.insertBefore(item, node);
+        inserted = true;
+        break;
+      }
+    }
+    if (!inserted) favGallery.appendChild(item);
+    favorites.set(i, item);
+    saveFavs();
+  }
+
+  function removeFavorite(i) {
+    const item = favorites.get(i);
+    if (!item) return;
+    item.remove();
+    favorites.delete(i);
+    if (favorites.size === 0) favEmpty.style.display = '';
+    saveFavs();
+  }
 
   // 先に全ての枠を順番通りに作成しておく（非表示）
   const wrappers = [];
@@ -262,23 +467,51 @@
       img.onload = () => {
         img.className = 'img-main';
 
-        const imgHover = document.createElement('img');
-        imgHover.src = img.src;
-        imgHover.alt = img.alt;
-        imgHover.className = 'img-hover';
+        // ☆ボタン
+        const star = document.createElement('button');
+        star.className = 'star-btn';
+        star.textContent = '☆';
+        star.title = 'お気に入り';
+        stars.set(i, star);
+        star.addEventListener('click', (e) => {
+          e.stopPropagation(); // コピー処理を発火させない
+          const isActive = star.classList.toggle('active');
+          star.textContent = isActive ? '★' : '☆';
+          if (isActive) {
+            addFavorite(i, img.src);
+          } else {
+            removeFavorite(i);
+          }
+        });
 
         wrapper.appendChild(img);
-        wrapper.appendChild(imgHover);
+        wrapper.appendChild(star);
         wrapper.appendChild(num);
         wrapper.style.display = 'flex';
 
-        wrapper.addEventListener('mouseenter', () => {
-          imgHover.style.visibility = 'visible';
-          img.style.opacity = '0';
-        });
-        wrapper.addEventListener('mouseleave', () => {
-          imgHover.style.visibility = 'hidden';
-          img.style.opacity = '1';
+        // localStorageから復元
+        if (savedFavs.has(i)) {
+          star.classList.add('active');
+          star.textContent = '★';
+          addFavorite(i, img.src);
+        }
+
+        wrapper.addEventListener('click', () => {
+          const text = `[bigEmoji:${i}]`;
+          navigator.clipboard.writeText(text).then(() => {
+            showToast(`📋 コピーしました： ${text}`);
+          }).catch(() => {
+            // clipboard API が使えない環境向けフォールバック
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            showToast(`📋 コピーしました： ${text}`);
+          });
         });
 
         loaded++;
