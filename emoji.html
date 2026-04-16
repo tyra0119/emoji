@@ -171,7 +171,7 @@
       background: rgba(0,0,0,0.85);
       color: #c8a96e;
       padding: 2px 0;
-      line-height: 1.4;
+      line-height: 1.2;
       font-family: 'Cinzel', monospace;
       pointer-events: none;
       flex-shrink: 0;
@@ -205,9 +205,37 @@
     ::-webkit-scrollbar-track { background: #0a0608; }
     ::-webkit-scrollbar-thumb { background: #5a1a1a; border-radius: 3px; }
     ::-webkit-scrollbar-thumb:hover { background: #8b1a1a; }
+
+    /* コピー通知トースト */
+    #toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: rgba(10, 4, 8, 0.95);
+      border: 1px solid #c0392b;
+      color: #c8a96e;
+      font-family: 'Cinzel', serif;
+      font-size: 0.85rem;
+      letter-spacing: 0.15em;
+      padding: 10px 24px;
+      border-radius: 4px;
+      box-shadow: 0 0 16px rgba(192, 57, 43, 0.6), 0 4px 20px rgba(0,0,0,0.9);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      white-space: nowrap;
+      z-index: 9999;
+    }
+    #toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
   </style>
 </head>
 <body>
+
+<div id="toast"></div>
 
 <header>
   <h1>Diablo Immortal Emoji</h1>
@@ -233,7 +261,16 @@
 <script>
   const gallery = document.getElementById('gallery');
   const countDisplay = document.getElementById('count-display');
+  const toast = document.getElementById('toast');
   let loaded = 0;
+  let toastTimer = null;
+
+  function showToast(text) {
+    toast.textContent = text;
+    toast.classList.add('show');
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 2000);
+  }
 
   // 先に全ての枠を順番通りに作成しておく（非表示）
   const wrappers = [];
@@ -279,6 +316,23 @@
         wrapper.addEventListener('mouseleave', () => {
           imgHover.style.visibility = 'hidden';
           img.style.opacity = '1';
+        });
+        wrapper.addEventListener('click', () => {
+          const text = `[bigEmoji:${i}]`;
+          navigator.clipboard.writeText(text).then(() => {
+            showToast(`📋 コピーしました： ${text}`);
+          }).catch(() => {
+            // clipboard API が使えない環境向けフォールバック
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            showToast(`📋 コピーしました： ${text}`);
+          });
         });
 
         loaded++;
