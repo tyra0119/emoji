@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Diablo Immortal - Emoji Gallery</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&display=swap');
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #0a0608;
+      background-image:
+        radial-gradient(ellipse at top, #1a0810 0%, #0a0608 60%),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='4' height='4' fill='%230a0608'/%3E%3Crect x='0' y='0' width='1' height='1' fill='%23110a0e' opacity='0.6'/%3E%3Crect x='2' y='2' width='1' height='1' fill='%23110a0e' opacity='0.4'/%3E%3C/svg%3E");
+      color: #c8a96e;
+      font-family:  serif;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    header {
+      text-align: center;
+      padding: 30px 10px 20px;
+      position: relative;
+    }
+
+    header::before,
+    header::after {
+      content: '';
+      display: block;
+      height: 2px;
+      background: linear-gradient(to right, transparent, #8b1a1a, #c0392b, #e74c3c, #c0392b, #8b1a1a, transparent);
+      margin: 12px auto;
+      max-width: 600px;
+    }
+
+    header h1 {
+      font-size: clamp(1.4rem, 5vw, 2.8rem);
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      background: linear-gradient(180deg, #f5d76e 0%, #c8a030 40%, #a07020 70%, #e8c060 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: none;
+      filter: drop-shadow(0 0 8px rgba(200, 160, 48, 0.5));
+    }
+
+    header p.subtitle {
+      font-size: clamp(0.65rem, 2vw, 0.85rem);
+      letter-spacing: 0.3em;
+      color: #7a4a2a;
+      text-transform: uppercase;
+      margin-top: 6px;
+    }
+
+    .ornament {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin: 6px 0;
+    }
+
+    .ornament span {
+      display: inline-block;
+      width: 40px;
+      height: 1px;
+      background: linear-gradient(to right, transparent, #8b1a1a);
+    }
+
+    .ornament span:last-child {
+      background: linear-gradient(to left, transparent, #8b1a1a);
+    }
+
+    .ornament-diamond {
+      width: 8px;
+      height: 8px;
+      background: #c0392b;
+      transform: rotate(45deg);
+      box-shadow: 0 0 6px rgba(192, 57, 43, 0.8);
+    }
+
+    .gallery-wrapper {
+      max-width: 1800px;
+      margin: 20px auto 0;
+    }
+
+    .gallery {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: flex-start;
+      padding: 20px;
+      background: rgba(10, 4, 8, 0.7);
+      border: 1px solid #3a1010;
+      border-radius: 4px;
+      box-shadow:
+        inset 0 0 40px rgba(0, 0, 0, 0.6),
+        0 0 20px rgba(139, 26, 26, 0.15);
+    }
+
+    .img-wrapper {
+      width: 100px;
+      height: 135px;
+      position: relative;
+      border: 1px solid #3a1515;
+      border-radius: 3px;
+      overflow: hidden;
+      background: #120608;
+      box-shadow: 0 0 4px rgba(0, 0, 0, 0.8);
+      transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .img-wrapper:hover {
+      transform: scale(1.1);
+      z-index: 10;
+      border-color: #c0392b;
+      box-shadow:
+        0 0 8px rgba(192, 57, 43, 0.6),
+        0 0 16px rgba(192, 57, 43, 0.3);
+    }
+
+    .img-wrapper img {
+      width: 100px;
+      height: 100px;
+      object-fit: contain;
+      display: block;
+      flex-shrink: 0;
+    }
+
+    .img-wrapper .img-num {
+      width: 100%;
+      text-align: center;
+      font-size: 20px;
+      font-weight: bold;
+      background: rgba(0,0,0,0.85);
+      color: #c8a96e;
+      padding: 2px 0;
+      line-height: 1.4;
+      font-family: 'Cinzel', monospace;
+      pointer-events: none;
+      flex-shrink: 0;
+    }
+
+    .count-bar {
+      text-align: center;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      color: #5a3a1a;
+      margin: 12px 0 4px;
+      text-transform: uppercase;
+    }
+
+    #count-display {
+      color: #c0392b;
+      font-weight: 700;
+    }
+
+    footer {
+      text-align: center;
+      padding: 30px 10px;
+      font-size: 0.6rem;
+      letter-spacing: 0.25em;
+      color: #3a1a0a;
+      text-transform: uppercase;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #0a0608; }
+    ::-webkit-scrollbar-thumb { background: #5a1a1a; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #8b1a1a; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Diablo Immortal Emoji</h1>
+<h2>[bigEmoji:番号]</h2>
+  <div class="ornament">
+    <span></span>
+    <div class="ornament-diamond"></div>
+    <span></span>
+  </div>
+</header>
+
+<div class="gallery-wrapper">
+  <div class="count-bar">
+    アイコン数: <span id="count-display">0</span>
+  </div>
+  <div class="gallery" id="gallery"></div>
+</div>
+
+<footer>
+  &copy; Blizzard Entertainment &mdash; Diablo Immortal
+</footer>
+
+<script>
+  const gallery = document.getElementById('gallery');
+  const countDisplay = document.getElementById('count-display');
+  let loaded = 0;
+
+  // 先に全ての枠を順番通りに作成しておく（非表示）
+  const wrappers = [];
+  for (let i = 1; i <= 500; i++) {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'img-wrapper';
+    wrapper.title = `#${i}`;
+    wrapper.style.display = 'none'; // ロード成功まで非表示
+    wrappers[i] = wrapper;
+    gallery.appendChild(wrapper);
+  }
+
+  function tryLoad(i) {
+    return new Promise((resolve) => {
+      const wrapper = wrappers[i];
+
+      const img = document.createElement('img');
+      img.src = `/images/emoji/${i}.png`;
+      img.alt = `${i}`;
+      img.loading = 'eager';
+
+      const num = document.createElement('span');
+      num.className = 'img-num';
+      num.textContent = i;
+
+      img.onload = () => {
+        wrapper.appendChild(img);
+        wrapper.appendChild(num);
+        wrapper.style.display = ''; // 表示する
+        loaded++;
+        countDisplay.textContent = loaded;
+        resolve(true);
+      };
+
+      img.onerror = () => {
+        // 存在しない場合は枠ごと削除
+        wrapper.remove();
+        resolve(false);
+      };
+    });
+  }
+
+  async function loadAll() {
+    const batch = 20;
+    for (let i = 1; i <= 500; i += batch) {
+      const promises = [];
+      for (let j = i; j < i + batch && j <= 500; j++) {
+        promises.push(tryLoad(j));
+      }
+      await Promise.all(promises);
+    }
+  }
+
+  loadAll();
+</script>
+</body>
+</html>
