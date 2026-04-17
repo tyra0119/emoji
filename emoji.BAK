@@ -19,7 +19,7 @@
         radial-gradient(ellipse at top, #1a0810 0%, #0a0608 60%),
         url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='4' height='4' fill='%230a0608'/%3E%3Crect x='0' y='0' width='1' height='1' fill='%23110a0e' opacity='0.6'/%3E%3Crect x='2' y='2' width='1' height='1' fill='%23110a0e' opacity='0.4'/%3E%3C/svg%3E");
       color: #c8a96e;
-      font-family:  serif;
+      font-family:  YJTop Ellipsis,ヒラギノ角ゴ ProN,Hiragino Kaku Gothic ProN,メイリオ,Meiryo,Osaka,ＭＳ Ｐゴシック,MS PGothic,sans-serif;
       min-height: 100vh;
       padding: 20px;
     }
@@ -133,7 +133,7 @@
 
     .img-wrapper img.img-main {
       width: 100px;
-      height: 100px;
+      height: 98px;
       object-fit: contain;
       display: block;
       flex-shrink: 0;
@@ -248,7 +248,7 @@
 
     .fav-item img {
       width: 100px;
-      height: 100px;
+      height: 98px;
       object-fit: contain;
       display: block;
       flex-shrink: 0;
@@ -326,14 +326,6 @@
 
 <div id="toast"></div>
 
-<!-- お気に入りセクション -->
-<div id="favorites-section">
-  <div class="fav-title">★ お気に入り ★</div>
-  <div id="favorites-gallery">
-    <div id="favorites-empty">お気に入りはまだありません</div>
-  </div>
-</div>
-
 <header>
   <h1>Diablo Immortal Emoji</h1>
 <h2>[bigEmoji:番号]</h2>
@@ -343,6 +335,14 @@
     <span></span>
   </div>
 </header>
+
+<!-- お気に入りセクション -->
+<div id="favorites-section">
+  <div class="fav-title">★ お気に入り ★</div>
+  <div id="favorites-gallery">
+    <div id="favorites-empty">お気に入りはまだありません</div>
+  </div>
+</div>
 
 <div class="gallery-wrapper">
   <div class="count-bar">
