@@ -37,7 +37,7 @@
       height: 2px;
       background: linear-gradient(to right, transparent, #8b1a1a, #c0392b, #e74c3c, #c0392b, #8b1a1a, transparent);
       margin: 12px auto;
-      max-width: 600px;
+      max-width: 1000px;
     }
 
     header h1 {
@@ -51,6 +51,10 @@
       background-clip: text;
       text-shadow: none;
       filter: drop-shadow(0 0 8px rgba(200, 160, 48, 0.5));
+    }
+
+    header h2 {
+      font-size: clamp(1.0rem, 3vw, 2.0rem);
     }
 
     header p.subtitle {
@@ -89,7 +93,7 @@
     }
 
     .gallery-wrapper {
-      max-width: 1800px;
+      max-width: 1735px;
       margin: 20px auto 0;
     }
 
@@ -143,15 +147,16 @@
 
     .img-wrapper .img-num {
       width: 100%;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       text-align: center;
-      font-size: 20px;
-      font-weight: bold;
+      font-size: 16px;
       background: rgba(0,0,0,0.85);
       color: #c8a96e;
-      padding: 2px 0;
-      line-height: 1.2;
+      line-height: 1;
       pointer-events: none;
-      flex-shrink: 0;
     }
 
     .count-bar {
@@ -185,7 +190,7 @@
 
     /* ★ お気に入りセクション */
     #favorites-section {
-      max-width: 1800px;
+      max-width: 1735px;
       margin: 0 auto 10px;
     }
 
@@ -213,7 +218,7 @@
       gap: 5px;
       justify-content: flex-start;
       padding: 12px 16px;
-      background: rgba(10, 4, 8, 0.8);
+      background: rgb(39 43 67 / 80%);
       border: 1px solid #5a3a10;
       border-radius: 4px;
       box-shadow:
@@ -253,14 +258,15 @@
 
     .fav-item .fav-num {
       width: 100%;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       text-align: center;
-      font-size: 20px;
-      font-weight: bold;
+      font-size: 16px;
       background: rgba(0,0,0,0.85);
       color: #c8a96e;
-      padding: 2px 0;
-      line-height: 1.2;
-      flex-shrink: 0;
+      line-height: 1;
     }
 
     /* ☆/★ ボタン */
@@ -289,6 +295,28 @@
     .star-btn.active {
       color: #f5d76e;
       text-shadow: 0 0 8px rgba(245, 215, 110, 0.9);
+    }
+
+    /* お気に入り欄の削除ボタン */
+    .fav-remove {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      font-size: 11px;
+      line-height: 1;
+      color: #7a3a2a;
+      background: rgba(0,0,0,0.6);
+      border: none;
+      border-radius: 2px;
+      padding: 1px 3px;
+      cursor: pointer;
+      z-index: 102;
+      transition: color 0.15s, text-shadow 0.15s;
+    }
+
+    .fav-remove:hover {
+      color: #e74c3c;
+      text-shadow: 0 0 6px rgba(231, 76, 60, 0.8);
     }
 
     /* コピー通知トースト */
@@ -322,8 +350,7 @@
 <div id="toast"></div>
 
 <header>
-  <h1>Diablo Immortal Emoji</h1>
-<h2>[bigEmoji:番号]</h2>
+  <img src="/images/emoji/di_logo.png" alt="Diablo Immortal" style="height:100px; width:auto; display:block; margin:0 auto;">
   <div class="ornament">
     <span></span>
     <div class="ornament-diamond"></div>
@@ -390,7 +417,24 @@
     num.className = 'fav-num';
     num.textContent = i;
 
+    // お気に入り欄の削除ボタン
+    const removeBtn = document.createElement('button');
+    removeBtn.className = 'fav-remove';
+    removeBtn.textContent = '✕';
+    removeBtn.title = 'お気に入りから削除';
+    removeBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      removeFavorite(i);
+      // ギャラリー側の★を☆に戻す
+      const star = stars.get(i);
+      if (star) {
+        star.classList.remove('active');
+        star.textContent = '☆';
+      }
+    });
+
     item.appendChild(img);
+    item.appendChild(removeBtn);
     item.appendChild(num);
 
     // お気に入りの画像をクリックしてもコピーできる
