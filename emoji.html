@@ -113,7 +113,7 @@
 
     .img-wrapper {
       width: 100px;
-      height: 130px;
+      height: 140px;
       position: relative;
       border: 1px solid #3a1515;
       border-radius: 3px;
@@ -152,10 +152,12 @@
       align-items: center;
       justify-content: center;
       text-align: center;
-      font-size: 16px;
+      font-size: 13px;
+      line-height: 1.3;
       background: rgba(0,0,0,0.85);
       color: #c8a96e;
-      line-height: 1;
+      padding: 2px 3px;
+      word-break: break-all;
       pointer-events: none;
     }
 
@@ -229,7 +231,7 @@
 
     .fav-item {
     width: 100px;
-    height: 130px;
+    height: 140px;
     position: relative;
     border: 1px solid #3a1515;
     border-radius: 3px;
@@ -263,10 +265,12 @@
       align-items: center;
       justify-content: center;
       text-align: center;
-      font-size: 16px;
+      font-size: 13px;
+      line-height: 1.3;
       background: rgba(0,0,0,0.85);
       color: #c8a96e;
-      line-height: 1;
+      padding: 2px 3px;
+      word-break: break-all;
     }
 
     /* ☆/★ ボタン */
@@ -378,6 +382,44 @@
 </footer>
 
 <script>
+  const STAMP_NAMES = {
+    4:'絶望', 7:'感謝', 10:'発見', 12:'おめでとうございます', 15:'乾杯', 16:'アルドール',
+    18:'まだまだ', 19:'ショック', 20:'決戦', 23:'ゴースト', 24:'頑張る', 25:'陰湿なる',
+    26:'不賛成', 27:'賛成', 29:'またな！', 30:'卒倒', 32:'シーッ！', 33:'こっちだ',
+    34:'震え', 35:'恥ずかしい', 36:'これ、直さないとね', 37:'こんにちは',
+    38:'ブルーマルティンの挨拶', 39:'派手に行こう', 40:'答えを探している', 41:'お知らせ',
+    42:'いい品だ', 43:'どいてくれ！', 44:'タスクを受けた', 45:'要リフィル',
+    48:'目が回る', 49:'へとへと', 50:'栄光の重荷', 51:'秘密', 55:'嘆願', 57:'貪欲',
+    58:'至高の道楽', 59:'没頭', 60:'やめておく', 61:'動けない', 62:'だめ',
+    63:'どうでもいい', 64:'欺瞞', 65:'ゴールド', 71:'飽食', 72:'調べる', 73:'拭き取る',
+    74:'グータッチ', 77:'乾杯！', 78:'うう！', 80:'内なる平穏', 81:'畜生', 82:'助けて',
+    83:'富を分け合う', 84:'祓魔術', 85:'お手上げ', 86:'戦いの鳴き声', 87:'懇願',
+    88:'困惑', 95:'そうは思わない', 98:'シーズンの猶予', 99:'不浄な憤怒',
+    103:'極度の忍耐', 108:'冒険へ！', 109:'死', 110:'聞こえない', 111:'もう行かないと',
+    113:'喉が乾いた', 115:'進め！', 120:'えっ！？', 121:'悲哀', 122:'拒絶',
+    123:'口説く', 124:'終わった！', 125:'食べ過ぎ', 126:'レジェンダリーハイプ',
+    127:'死ね、虫けらめ！', 128:'おっと', 129:'臭うな', 137:'切望', 138:'お母さん？',
+    139:'ずっと一緒', 140:'激しい怒り', 143:'新着メール', 144:'迷った',
+    145:'キスを飛ばす', 152:'内なる美', 153:'すすり泣き', 156:'アライアンスのために',
+    157:'ホードのために！', 158:'トーレンの力', 159:'考え直せ', 160:'べったり',
+    161:'うわさ話', 165:'情熱的な別れ', 166:'今行く！', 167:'狂気じみた笑い',
+    170:'激しい訓練', 172:'来い！', 175:'クラス変更', 176:'つつく', 177:'束の間の休息',
+    178:'万事順調', 180:'よだれ', 181:'ミー！', 182:'不眠', 185:'料理', 187:'裏切り',
+    188:'うっとり', 190:'売却！', 191:'よく休んだ', 192:'高額入札', 193:'現行犯',
+    194:'計算済み', 195:'フッ', 196:'頑張れ', 197:'踊り', 198:'圧倒的な力',
+    200:'不眠', 202:'我が友', 219:'おおっと！', 220:'横目で見る', 221:'喜び',
+    222:'興奮状態', 226:'いい度胸だ', 230:'驚き', 239:'勝てるぞ！', 240:'乾杯',
+    241:'霊魂ファイア', 242:'計画的', 244:'それではまた', 245:'会えてよかった',
+    246:'行くな！', 247:'弓', 248:'くれるの？', 252:'酔っ払い', 253:'これにはまだ早すぎる',
+    256:'怯え', 257:'圧力', 260:'肋骨砕き', 261:'自業自得', 262:'新品同様',
+    263:'言い残すことは？', 267:'今を捉える', 268:'あなたに', 269:'リップアンドティア',
+    270:'準備万端'
+  };
+
+  function stampLabel(i) {
+    return STAMP_NAMES[i] ? `${i}:${STAMP_NAMES[i]}` : `${i}`;
+  }
+
   const gallery = document.getElementById('gallery');
   const countDisplay = document.getElementById('count-display');
   const toast = document.getElementById('toast');
@@ -415,7 +457,7 @@
 
     const num = document.createElement('span');
     num.className = 'fav-num';
-    num.textContent = i;
+    num.textContent = stampLabel(i);
 
     // お気に入り欄の削除ボタン
     const removeBtn = document.createElement('button');
@@ -501,7 +543,7 @@
 
       const num = document.createElement('span');
       num.className = 'img-num';
-      num.textContent = i;
+      num.textContent = stampLabel(i);
 
       img.onload = () => {
         img.className = 'img-main';
