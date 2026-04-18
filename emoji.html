@@ -492,7 +492,7 @@
 <div id="toast"></div>
 
 <div id="copy-popup">
-  <div class="popup-title">コピー形式（アイコンのみ、アイコン＋スタンプ名）を選択</div>
+  <div class="popup-title">コピーしたいほうを選択してください</div>
   <button class="copy-option" id="copy-opt1"></button>
   <button class="copy-option" id="copy-opt2"></button>
 </div>
@@ -792,13 +792,15 @@
   function showCopyPopup(e, i) {
     e.stopPropagation();
     const name    = STAMP_NAMES[i] || null;
+    const text1_msg = 'スタンプのみ';
     const text1   = `[bigEmoji:${i}]`;
+    const text2_msg = 'スタンプ＋スタンプ名';
     const text2   = name ? `[[bigEmoji:${i}] ${name}]` : `[[bigEmoji:${i}] ?]`;
 
-    copyOpt1.textContent = text1;
+    copyOpt1.textContent = text1_msg;
     copyOpt1.onclick = () => { copyText(text1); hidePopup(); };
 
-    copyOpt2.textContent = text2;
+    copyOpt2.textContent = text2_msg;
     copyOpt2.disabled = !name;
     if (name) {
       copyOpt2.onclick = () => { copyText(text2); hidePopup(); };
