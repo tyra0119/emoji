@@ -217,6 +217,30 @@
       cursor: pointer;
     }
 
+    #btn-export {
+      padding: 4px 12px;
+      background: transparent;
+      border: 1px solid #5a3a10;
+      border-radius: 3px;
+      color: #a07840;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s, background 0.15s;
+      white-space: nowrap;
+    }
+
+    #btn-export:hover:not(:disabled) {
+      border-color: #c8a96e;
+      color: #c8a96e;
+      background: rgba(200, 160, 48, 0.08);
+    }
+
+    #btn-export:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
     footer {
       text-align: center;
       padding: 30px 10px;
@@ -461,6 +485,7 @@
       transform: translateX(-50%) translateY(0);
     }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
 </head>
 <body>
 
@@ -500,6 +525,7 @@
         <input type="checkbox" id="filter-unnamed" checked> スタンプ名無
       </label>
     </div>
+    <button id="btn-export">📥 XLS出力</button>
   </div>
   <div class="gallery" id="gallery"></div>
 </div>
@@ -1001,6 +1027,92 @@
       await Promise.all(promises);
     }
   }
+
+  // ---- XLS エクスポート (ExcelJS) ----
+  document.getElementById('btn-export').addEventListener('click', async () => {
+    const btnExport = document.getElementById('btn-export');
+    btnExport.disabled = true;
+    btnExport.textContent = '⏳ 生成中...';
+
+    try {
+      // ロード済み かつ お気に入りでない スタンプを収集
+      const rows = [];
+      for (let i = 1; i <= 500; i++) {
+        const wrapper = wrappers[i];
+        if (!wrapper || wrapper.style.display === 'none') continue;
+        if (favorites.has(i)) continue;
+        const imgEl = wrapper.querySelector('img.img-main');
+        rows.push({ id: i, name: STAMP_NAMES[i] || '', imgSrc: imgEl ? imgEl.src : null });
+      }
+
+      const workbook  = new ExcelJS.Workbook();
+      workbook.creator = 'Diablo Immortal Emoji Gallery';
+      const ws = workbook.addWorksheet('スタンプ一覧');
+
+      // 列定義
+      ws.columns = [
+        { header: 'スタンプ', key: 'stamp', width: 10 },
+        { header: '番号',     key: 'id',    width: 8  },
+        { header: 'スタンプ名', key: 'name', width: 28 },
+      ];
+
+      // ヘッダー行スタイル
+      ws.getRow(1).font      = { bold: true, size: 11 };
+      ws.getRow(1).alignment = { vertical: 'middle', horizontal: 'center' };
+      ws.getRow(1).height    = 18;
+
+      const IMG_PX      = 60;  // 画像サイズ (px)
+      const ROW_HEIGHT  = 50;  // 行高さ (Excelポイント)
+
+      for (let idx = 0; idx < rows.length; idx++) {
+        const r      = rows[idx];
+        const rowNum = idx + 2; // 2行目〜（1行目はヘッダー）
+
+        const row = ws.getRow(rowNum);
+        row.height               = ROW_HEIGHT;
+        row.getCell('id').value  = r.id;
+        row.getCell('name').value = r.name;
+        row.alignment            = { vertical: 'middle', horizontal: 'center' };
+        row.commit();
+
+        // 画像を fetch → ArrayBuffer → ExcelJS に埋め込み
+        if (r.imgSrc) {
+          try {
+            const resp  = await fetch(r.imgSrc);
+            const buf   = await resp.arrayBuffer();
+            const imgId = workbook.addImage({ buffer: buf, extension: 'png' });
+            ws.addImage(imgId, {
+              tl:  { col: 0,        row: rowNum - 1 },
+              ext: { width: IMG_PX, height: IMG_PX  },
+            });
+          } catch (fetchErr) { /* 画像取得失敗は無視 */ }
+        }
+      }
+
+      const buffer   = await workbook.xlsx.writeBuffer();
+      const blob     = new Blob([buffer], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      });
+      const now      = new Date();
+      const dateStr  = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}`;
+      const url      = URL.createObjectURL(blob);
+      const a        = document.createElement('a');
+      a.href         = url;
+      a.download     = `stamp_list_${dateStr}.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast(`📥 ${rows.length}件をエクスポートしました`);
+
+    } catch (err) {
+      console.error(err);
+      showToast('❌ エクスポートに失敗しました');
+    }
+
+    btnExport.disabled    = false;
+    btnExport.textContent = '📥 XLS出力';
+  });
 
   loadAll();
 </script>
