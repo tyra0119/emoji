@@ -421,19 +421,33 @@
     }
 
     .copy-option {
-      display: block;
+      display: flex;
+      align-items: center;
       width: 100%;
-      padding: 20px 10px;
+      padding: 6px 10px;
       background: transparent;
       border: 1px solid #3a1515;
       border-radius: 3px;
       color: #c8a96e;
       font-family: monospace;
-      font-size: 16px;
+      font-size: 12px;
       text-align: left;
       cursor: pointer;
       transition: background 0.12s, border-color 0.12s;
+    }
+
+    .copy-option img {
+      width: 40px;
+      height: 40px;
+      object-fit: contain;
+      flex-shrink: 0;
+      border-radius: 2px;
+      background: #0a0608;
+    }
+
+    .copy-option .opt-label {
       word-break: break-all;
+      line-height: 1.4;
     }
 
     .copy-option:hover:not(:disabled) {
@@ -445,6 +459,10 @@
       color: #3a3a3a;
       border-color: #1e1e1e;
       cursor: not-allowed;
+    }
+
+    .copy-option:disabled img {
+      opacity: 0.3;
     }
 
     .popup-title {
@@ -792,20 +810,24 @@
   function showCopyPopup(e, i) {
     e.stopPropagation();
     const name    = STAMP_NAMES[i] || null;
-    const text1_msg = 'スタンプのみ';
-    const text1   = `[bigEmoji:${i}]`;
-    const text2_msg = 'スタンプ＋スタンプ名';
-    const text2   = name ? `[[bigEmoji:${i}] ${name}]` : `[[bigEmoji:${i}] ?]`;
+    const text1 = `[bigEmoji:${i}]`;
+    const text2 = name ? `[[bigEmoji:${i}] ${name}]` : null;
+    const imgSrc = `/images/emoji/${i}.png`;
 
-    copyOpt1.textContent = text1_msg;
-    copyOpt1.onclick = () => { copyText(text1); hidePopup(); };
+    // ボタン1: 画像のみ
+    copyOpt1.innerHTML = `<img src="${imgSrc}" alt="${i}">`;
+    copyOpt1.disabled  = false;
+    copyOpt1.onclick   = () => { copyText(text1); hidePopup(); };
 
-    copyOpt2.textContent = text2_msg;
-    copyOpt2.disabled = !name;
+    // ボタン2: 画像＋スタンプ名
     if (name) {
-      copyOpt2.onclick = () => { copyText(text2); hidePopup(); };
+      copyOpt2.innerHTML = `<span class="opt-label">[</span><img src="${imgSrc}" alt="${i}"><span class="opt-label">${name}]</span>`;
+      copyOpt2.disabled  = false;
+      copyOpt2.onclick   = () => { copyText(text2); hidePopup(); };
     } else {
-      copyOpt2.onclick = null;
+      copyOpt2.innerHTML = `<img src="${imgSrc}" alt="${i}"><span class="opt-label">?</span>`;
+      copyOpt2.disabled  = true;
+      copyOpt2.onclick   = null;
     }
 
     // タッチ・マウス両対応でクリック座標を取得
