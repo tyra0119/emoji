@@ -113,7 +113,8 @@
 
     .img-wrapper {
       width: 100px;
-      height: 140px;
+      min-height: 140px;
+      max-height: 150px;
       position: relative;
       border: 1px solid #3a1515;
       border-radius: 3px;
@@ -149,16 +150,25 @@
       width: 100%;
       flex: 1;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
-      font-size: 13px;
-      line-height: 1.3;
       background: rgba(0,0,0,0.85);
       color: #c8a96e;
       padding: 2px 3px;
-      word-break: break-all;
       pointer-events: none;
+      gap: 1px;
+    }
+    .img-wrapper .img-num .num-id {
+      font-size: 13px;
+      line-height: 1.2;
+    }
+    .img-wrapper .img-num .num-name {
+      font-size: 10px;
+      line-height: 1.3;
+      color: #a07840;
+      word-break: break-all;
     }
 
     .count-bar {
@@ -231,7 +241,8 @@
 
     .fav-item {
     width: 100px;
-    height: 140px;
+    min-height: 140px;
+    max-height: 150px;
     position: relative;
     border: 1px solid #3a1515;
     border-radius: 3px;
@@ -262,14 +273,23 @@
       width: 100%;
       flex: 1;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
-      font-size: 13px;
-      line-height: 1.3;
       background: rgba(0,0,0,0.85);
       color: #c8a96e;
       padding: 2px 3px;
+      gap: 1px;
+    }
+    .fav-item .fav-num .num-id {
+      font-size: 13px;
+      line-height: 1.2;
+    }
+    .fav-item .fav-num .num-name {
+      font-size: 10px;
+      line-height: 1.3;
+      color: #a07840;
       word-break: break-all;
     }
 
@@ -416,8 +436,20 @@
     270:'準備万端'
   };
 
-  function stampLabel(i) {
-    return STAMP_NAMES[i] ? `${i}:${STAMP_NAMES[i]}` : `${i}`;
+  function buildNumEl(i, className) {
+    const el = document.createElement('span');
+    el.className = className;
+    const idSpan = document.createElement('span');
+    idSpan.className = 'num-id';
+    idSpan.textContent = i;
+    el.appendChild(idSpan);
+    if (STAMP_NAMES[i]) {
+      const nameSpan = document.createElement('span');
+      nameSpan.className = 'num-name';
+      nameSpan.textContent = STAMP_NAMES[i];
+      el.appendChild(nameSpan);
+    }
+    return el;
   }
 
   const gallery = document.getElementById('gallery');
@@ -455,9 +487,7 @@
     img.src = src;
     img.alt = `${i}`;
 
-    const num = document.createElement('span');
-    num.className = 'fav-num';
-    num.textContent = stampLabel(i);
+    const num = buildNumEl(i, 'fav-num');
 
     // お気に入り欄の削除ボタン
     const removeBtn = document.createElement('button');
@@ -541,9 +571,7 @@
       img.alt = `${i}`;
       img.loading = 'eager';
 
-      const num = document.createElement('span');
-      num.className = 'img-num';
-      num.textContent = stampLabel(i);
+      const num = buildNumEl(i, 'img-num');
 
       img.onload = () => {
         img.className = 'img-main';
