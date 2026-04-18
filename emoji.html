@@ -172,9 +172,13 @@
     }
 
     .count-bar {
-      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
       font-size: 0.7rem;
-      letter-spacing: 0.2em;
+      letter-spacing: 0.1em;
       color: #5a3a1a;
       margin: 12px 0 4px;
       text-transform: uppercase;
@@ -183,6 +187,34 @@
     #count-display {
       color: #c0392b;
       font-weight: 700;
+    }
+
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .filter-label {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      color: #7a5a2a;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      transition: color 0.15s;
+    }
+
+    .filter-label:hover {
+      color: #c8a96e;
+    }
+
+    .filter-label input[type="checkbox"] {
+      accent-color: #c0392b;
+      width: 13px;
+      height: 13px;
+      cursor: pointer;
     }
 
     footer {
@@ -392,7 +424,15 @@
 
 <div class="gallery-wrapper">
   <div class="count-bar">
-    アイコン数: <span id="count-display">0</span>
+    <span>アイコン数: <span id="count-display">0</span></span>
+    <div class="filter-group">
+      <label class="filter-label">
+        <input type="checkbox" id="filter-named" checked> スタンプ名有
+      </label>
+      <label class="filter-label">
+        <input type="checkbox" id="filter-unnamed" checked> スタンプ名無
+      </label>
+    </div>
   </div>
   <div class="gallery" id="gallery"></div>
 </div>
@@ -598,6 +638,29 @@
   let loaded = 0;
   let toastTimer = null;
 
+  const filterNamed   = document.getElementById('filter-named');
+  const filterUnnamed = document.getElementById('filter-unnamed');
+
+  function applyFilter() {
+    const showNamed   = filterNamed.checked;
+    const showUnnamed = filterUnnamed.checked;
+    for (const [i, wrapper] of Object.entries(wrappers)) {
+      if (!wrapper || wrapper.style.display === 'none') continue; // 未ロード分はスキップ
+      const hasName = !!STAMP_NAMES[i];
+      const visible = hasName ? showNamed : showUnnamed;
+      wrapper.style.visibility = visible ? '' : 'hidden';
+      wrapper.style.width      = visible ? '' : '0';
+      wrapper.style.height     = visible ? '' : '0';
+      wrapper.style.margin     = visible ? '' : '0';
+      wrapper.style.padding    = visible ? '' : '0';
+      wrapper.style.border     = visible ? '' : 'none';
+      wrapper.style.overflow   = visible ? '' : 'hidden';
+    }
+  }
+
+  filterNamed.addEventListener('change', applyFilter);
+  filterUnnamed.addEventListener('change', applyFilter);
+
   function showToast(text) {
     toast.textContent = text;
     toast.classList.add('show');
@@ -731,6 +794,19 @@
         wrapper.appendChild(star);
         wrapper.appendChild(num);
         wrapper.style.display = 'flex';
+
+        // フィルター即時適用
+        const hasName = !!STAMP_NAMES[i];
+        const visible = hasName ? filterNamed.checked : filterUnnamed.checked;
+        if (!visible) {
+          wrapper.style.visibility = 'hidden';
+          wrapper.style.width = '0';
+          wrapper.style.height = '0';
+          wrapper.style.margin = '0';
+          wrapper.style.padding = '0';
+          wrapper.style.border = 'none';
+          wrapper.style.overflow = 'hidden';
+        }
 
         // localStorageから復元
         if (savedFavs.has(i)) {
