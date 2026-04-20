@@ -550,6 +550,9 @@
       <label class="filter-label">
         <input type="checkbox" id="filter-unnamed" checked> スタンプ名無
       </label>
+      <label class="filter-label">
+        <input type="checkbox" id="filter-noimage"> 画像なし
+      </label>
     </div>
     <button id="btn-export">📥 XLS出力</button>
   </div>
@@ -805,6 +808,7 @@
 
   const filterNamed   = document.getElementById('filter-named');
   const filterUnnamed = document.getElementById('filter-unnamed');
+  const filterNoimage = document.getElementById('filter-noimage');
 
   // ---- コピーポップアップ ----
   const copyPopup = document.getElementById('copy-popup');
@@ -888,16 +892,23 @@
   function applyFilter() {
     const showNamed   = filterNamed.checked;
     const showUnnamed = filterUnnamed.checked;
+    const showNoimage = filterNoimage.checked;
     for (const [i, wrapper] of Object.entries(wrappers)) {
-      if (!wrapper || !wrapper.dataset.loaded) continue; // 未ロード分はスキップ
-      const hasName = !!STAMP_NAMES[i];
-      const visible = hasName ? showNamed : showUnnamed;
+      if (!wrapper || !wrapper.dataset.loaded) continue;
+      let visible;
+      if (wrapper.dataset.noimage) {
+        visible = showNoimage;
+      } else {
+        const hasName = !!STAMP_NAMES[i];
+        visible = hasName ? showNamed : showUnnamed;
+      }
       wrapper.style.display = visible ? 'flex' : 'none';
     }
   }
 
   filterNamed.addEventListener('change', applyFilter);
   filterUnnamed.addEventListener('change', applyFilter);
+  filterNoimage.addEventListener('change', applyFilter);
 
   function showToast(text) {
     toast.textContent = text;
@@ -1017,20 +1028,11 @@
         wrapper.appendChild(star);
         wrapper.appendChild(num);
         wrapper.dataset.loaded = '1';
-        wrapper.style.display = 'flex';
 
         // フィルター即時適用
         const hasName = !!STAMP_NAMES[i];
         const visible = hasName ? filterNamed.checked : filterUnnamed.checked;
-        if (!visible) {
-          wrapper.style.visibility = 'hidden';
-          wrapper.style.width = '0';
-          wrapper.style.height = '0';
-          wrapper.style.margin = '0';
-          wrapper.style.padding = '0';
-          wrapper.style.border = 'none';
-          wrapper.style.overflow = 'hidden';
-        }
+        wrapper.style.display = visible ? 'flex' : 'none';
 
         // localStorageから復元
         if (savedFavs.has(i)) {
@@ -1047,9 +1049,19 @@
       };
 
       img.onerror = () => {
-        // 存在しない場合は枠ごと削除
-        wrapper.remove();
-        resolve(false);
+        // ファイルが見つからない → noimage.png を表示
+        img.onerror = null; // 無限ループ防止
+        img.onload  = null; // noimage.png ロード時に元のonloadが発火するのを防止
+        img.src = '/images/emoji/noimage.png';
+        img.className = 'img-main';
+
+        wrapper.appendChild(img);
+        wrapper.appendChild(num);
+        wrapper.dataset.loaded  = '1';
+        wrapper.dataset.noimage = '1';
+        wrapper.style.display   = filterNoimage.checked ? 'flex' : 'none';
+        wrapper.style.cursor    = 'default';
+        resolve(true);
       };
     });
   }
