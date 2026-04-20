@@ -505,6 +505,13 @@
     }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-3FFMEFN5MT"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){{dataLayer.push(arguments);}}
+    gtag('js', new Date());
+    gtag('config', 'G-3FFMEFN5MT');
+  </script>
 </head>
 <body>
 
@@ -642,13 +649,17 @@
 97:'がっかり',
 98:'シーズンの猶予',
 99:'不浄な憤怒',
+100: '隠れる',
 101:'私は大丈夫',
+102:'強いハグ',
 103:'極度の忍耐',
 108:'冒険へ！',
 109:'死',
 110:'聞こえない',
 111:'もう行かないと',
+112:'こっちに来てくれ',
 113:'喉が乾いた',
+114:'正義の憤怒',
 115:'進め！',
 117:'悪運',
 118:'アーケイン・アドバンテージ',
@@ -668,6 +679,8 @@
 138:'お母さん？',
 139:'ずっと一緒',
 140:'激しい怒り',
+141:'熟考',
+142:'専門外',
 143:'新着メール',
 144:'迷った',
 145:'キスを飛ばす',
@@ -678,6 +691,7 @@
 150:'勝利の光',
 152:'内なる美',
 153:'すすり泣き',
+154:'悲しいかな',
 155:'お前だ！',
 156:'アライアンスのために',
 157:'ホードのために！',
@@ -687,6 +701,7 @@
 161:'うわさ話',
 162:'素晴らしい考え',
 163:'一緒に行こう',
+164:'長い一日',
 165:'情熱的な別れ',
 166:'今行く！',
 167:'狂気じみた笑い',
@@ -703,6 +718,8 @@
 180:'よだれ',
 181:'ミー！',
 182:'不眠',
+183:'まだだ',
+184:'これは重要だ',
 185:'料理',
 187:'裏切り',
 188:'うっとり',
@@ -872,16 +889,10 @@
     const showNamed   = filterNamed.checked;
     const showUnnamed = filterUnnamed.checked;
     for (const [i, wrapper] of Object.entries(wrappers)) {
-      if (!wrapper || wrapper.style.display === 'none') continue; // 未ロード分はスキップ
+      if (!wrapper || !wrapper.dataset.loaded) continue; // 未ロード分はスキップ
       const hasName = !!STAMP_NAMES[i];
       const visible = hasName ? showNamed : showUnnamed;
-      wrapper.style.visibility = visible ? '' : 'hidden';
-      wrapper.style.width      = visible ? '' : '0';
-      wrapper.style.height     = visible ? '' : '0';
-      wrapper.style.margin     = visible ? '' : '0';
-      wrapper.style.padding    = visible ? '' : '0';
-      wrapper.style.border     = visible ? '' : 'none';
-      wrapper.style.overflow   = visible ? '' : 'hidden';
+      wrapper.style.display = visible ? 'flex' : 'none';
     }
   }
 
@@ -1005,6 +1016,7 @@
         wrapper.appendChild(img);
         wrapper.appendChild(star);
         wrapper.appendChild(num);
+        wrapper.dataset.loaded = '1';
         wrapper.style.display = 'flex';
 
         // フィルター即時適用
