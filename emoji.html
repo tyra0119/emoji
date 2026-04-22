@@ -521,6 +521,7 @@
   <div class="popup-title">コピーしたいほうを選択してください</div>
   <button class="copy-option" id="copy-opt1"></button>
   <button class="copy-option" id="copy-opt2"></button>
+  <button class="copy-option" id="copy-opt3"></button>
 </div>
 
 <header>
@@ -814,6 +815,7 @@
   const copyPopup = document.getElementById('copy-popup');
   const copyOpt1  = document.getElementById('copy-opt1');
   const copyOpt2  = document.getElementById('copy-opt2');
+  const copyOpt3  = document.getElementById('copy-opt3');
 
   function copyText(text) {
     navigator.clipboard.writeText(text).catch(() => {
@@ -833,7 +835,8 @@
     e.stopPropagation();
     const name    = STAMP_NAMES[i] || null;
     const text1 = `[bigEmoji:${i}]`;
-    const text2 = name ? `[[bigEmoji:${i}] ${name}]` : null;
+    const text2 = name ? `[[bigEmoji:${i}]${name}]` : null;
+    const text3 = name ? `[${name}[bigEmoji:${i}]]` : null;
     const imgSrc = `/images/emoji/${i}.png`;
 
     // ボタン1: 画像のみ
@@ -846,10 +849,16 @@
       copyOpt2.innerHTML = `<span class="opt-label">[</span><img src="${imgSrc}" alt="${i}"><span class="opt-label">${name}]</span>`;
       copyOpt2.disabled  = false;
       copyOpt2.onclick   = () => { copyText(text2); hidePopup(); };
+      copyOpt3.innerHTML = `<span class="opt-label">[${name}</span><img src="${imgSrc}" alt="${i}"><span class="opt-label">]</span>`;
+      copyOpt3.disabled  = false;
+      copyOpt3.onclick   = () => { copyText(text3); hidePopup(); };
     } else {
       copyOpt2.innerHTML = `<img src="${imgSrc}" alt="${i}"><span class="opt-label">?</span>`;
       copyOpt2.disabled  = true;
       copyOpt2.onclick   = null;
+      copyOpt3.innerHTML = `<img src="${imgSrc}" alt="${i}"><span class="opt-label">?</span>`;
+      copyOpt3.disabled  = true;
+      copyOpt3.onclick   = null;
     }
 
     // タッチ・マウス両対応でクリック座標を取得
