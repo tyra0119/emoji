@@ -376,7 +376,7 @@ print(f'''<!DOCTYPE html>
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 6px 4px 4px;
+      padding: 0px 4px 4px;
       position: relative;
       transition: border-color 0.15s, box-shadow 0.15s;
     }}
@@ -396,8 +396,8 @@ print(f'''<!DOCTYPE html>
     .rank-2 {{ color: #b0b8c0 !important; font-weight: 700; }}
     .rank-3 {{ color: #c8813a !important; font-weight: 700; }}
     .stamp-card img {{
-      width: 70px;
-      height: 70px;
+      width: 100px;
+      height: 98px;
       object-fit: contain;
     }}
     .stamp-card .stamp-id {{
@@ -441,15 +441,15 @@ print(f'''<!DOCTYPE html>
     }}
     .text-row:hover {{ border-color: #c0392b; }}
     .text-row .rank {{
-      font-size: 16px;
+      font-size: 20px;
       color: #5a3a1a;
       font-family: 'Cinzel', serif;
       min-width: 28px;
       text-align: right;
     }}
     .text-row img {{
-      width: 40px;
-      height: 40px;
+      width: 100px;
+      height: 100px;
       object-fit: contain;
       flex-shrink: 0;
     }}
@@ -464,7 +464,7 @@ print(f'''<!DOCTYPE html>
       line-height: 1.4;
     }}
     .text-row .text-meta {{
-      font-size: 15px;
+      font-size: 20px;
       color: #5a3a1a;
       margin-top: 2px;
     }}
@@ -556,8 +556,8 @@ if text_ranking:
       <img src="/images/emoji/{sid}.png" alt="{sid}"
            onerror="this.src='/images/emoji/noimage.png'">
       <div class="text-info">
+        <div class="text-meta">{html.escape(name)}</div>
         <div class="text-str">{html.escape(txt)}</div>
-        <div class="text-meta">{html.escape(name) + ' / ' if name else ''}{last}</div>
       </div>
       <div class="text-cnt">{cnt}</div>
     </div>''')
