@@ -527,7 +527,6 @@ if stamp_ranking:
       <span class="rank {rank_cls}">#{idx}</span>
       <img src="/images/emoji/{sid}.png" alt="{sid}"
            onerror="this.src='/images/emoji/noimage.png'">
-      <div class="stamp-id">{sid}</div>
       <div class="stamp-name">{html.escape(name)}</div>
       <div class="stamp-cnt">{cnt} 回</div>
     </div>''')
