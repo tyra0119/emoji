@@ -1,0 +1,83 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# PUT https://tyra.jp/di/api/regist_popular
+# 設置先: /var/www/html/di/api/regist_popular.py
+# パーミッション: chmod 755
+# DB保存先: /var/lib/stamp_popular/stamp_popular.db
+#   (初回) sudo mkdir -p /var/lib/stamp_popular
+#          sudo chown www-data:www-data /var/lib/stamp_popular
+
+import json
+import sqlite3
+import sys
+import os
+from datetime import datetime, timezone, timedelta
+
+DB_PATH = '/var/lib/stamp_popular/stamp_popular.db'
+
+def send(status_code, body_dict):
+    status_text = {200: 'OK', 400: 'Bad Request', 405: 'Method Not Allowed'}
+    print(f"Status: {status_code} {status_text.get(status_code, '')}")
+    print("Content-Type: application/json; charset=utf-8")
+    print("Access-Control-Allow-Origin: *")
+    print("Access-Control-Allow-Methods: PUT, OPTIONS")
+    print("Access-Control-Allow-Headers: Content-Type")
+    print()
+    print(json.dumps(body_dict, ensure_ascii=False))
+
+method = os.environ.get('REQUEST_METHOD', '')
+
+# プリフライトリクエスト (CORS)
+if method == 'OPTIONS':
+    send(200, {})
+    sys.exit(0)
+
+if method != 'PUT':
+    send(405, {"error": "Method not allowed"})
+    sys.exit(0)
+
+# リクエストボディ読み込み
+try:
+    content_length = int(os.environ.get('CONTENT_LENGTH', 0))
+    body = sys.stdin.buffer.read(content_length).decode('utf-8') if content_length > 0 else ''
+    data = json.loads(body)
+except Exception as e:
+    send(400, {"error": f"Invalid request: {e}"})
+    sys.exit(0)
+
+stamp_id      = data.get('stamp_id')
+selected_text = data.get('selected_text', '')
+
+if stamp_id is None:
+    send(400, {"error": "stamp_id is required"})
+    sys.exit(0)
+
+# 日時 (JST)
+jst     = timezone(timedelta(hours=9))
+now_jst = datetime.now(jst).strftime('%Y-%m-%d %H:%M:%S')
+
+# SQLite3 に保存
+try:
+    os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
+    conn = sqlite3.connect(DB_PATH)
+    cur  = conn.cursor()
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS stamp_popular (
+            id            INTEGER PRIMARY KEY AUTOINCREMENT,
+            datetime      TEXT    NOT NULL,
+            stamp_id      INTEGER NOT NULL,
+            selected_text TEXT    NOT NULL
+        )
+    ''')
+    cur.execute(
+        'INSERT INTO stamp_popular (datetime, stamp_id, selected_text) VALUES (?, ?, ?)',
+        (now_jst, int(stamp_id), selected_text)
+    )
+    conn.commit()
+    conn.close()
+except Exception as e:
+    send(500, {"error": f"DB error: {e}"})
+    sys.exit(0)
+
+send(200, {"status": "ok", "datetime": now_jst, "stamp_id": stamp_id})

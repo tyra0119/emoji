@@ -817,7 +817,7 @@
   const copyOpt2  = document.getElementById('copy-opt2');
   const copyOpt3  = document.getElementById('copy-opt3');
 
-  function copyText(text) {
+  function copyText(text, stampId) {
     navigator.clipboard.writeText(text).catch(() => {
       const ta = document.createElement('textarea');
       ta.value = text;
@@ -829,6 +829,13 @@
       document.body.removeChild(ta);
     });
     showToast(`📋 コピーしました： ${text}`);
+
+    // 人気度記録 API に送信 (失敗しても無視)
+    fetch('https://tyra.jp/di/api/regist_popular', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ stamp_id: stampId, selected_text: text })
+    }).catch(() => {});
   }
 
   function showCopyPopup(e, i) {
@@ -842,16 +849,16 @@
     // ボタン1: 画像のみ
     copyOpt1.innerHTML = `<img src="${imgSrc}" alt="${i}">`;
     copyOpt1.disabled  = false;
-    copyOpt1.onclick   = () => { copyText(text1); hidePopup(); };
+    copyOpt1.onclick   = () => { copyText(text1, i); hidePopup(); };
 
     // ボタン2: 画像＋スタンプ名
     if (name) {
       copyOpt2.innerHTML = `<span class="opt-label">[</span><img src="${imgSrc}" alt="${i}"><span class="opt-label">${name}]</span>`;
       copyOpt2.disabled  = false;
-      copyOpt2.onclick   = () => { copyText(text2); hidePopup(); };
+      copyOpt2.onclick   = () => { copyText(text2, i); hidePopup(); };
       copyOpt3.innerHTML = `<span class="opt-label">[${name}</span><img src="${imgSrc}" alt="${i}"><span class="opt-label">]</span>`;
       copyOpt3.disabled  = false;
-      copyOpt3.onclick   = () => { copyText(text3); hidePopup(); };
+      copyOpt3.onclick   = () => { copyText(text3, i); hidePopup(); };
     } else {
       copyOpt2.innerHTML = `<img src="${imgSrc}" alt="${i}"><span class="opt-label">?</span>`;
       copyOpt2.disabled  = true;

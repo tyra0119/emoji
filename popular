@@ -1,0 +1,574 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# 人気スタンプランキングページ
+# 設置先: /var/www/html/di/popular.py
+# chmod 755
+# アクセス: https://tyra.jp/di/popular
+
+import sqlite3
+import os
+import html
+
+DB_PATH = '/var/lib/stamp_popular/stamp_popular.db'
+
+STAMP_NAMES = {
+3:'一休み',
+4:'絶望',
+5:'復讐に燃ゆる目',
+7:'感謝',
+10:'発見',
+12:'おめでとうございます',
+13:'侮辱',
+15:'乾杯',
+16:'アルドール',
+17:'頭痛',
+18:'まだまだ',
+19:'ショック',
+20:'決戦',
+21:'ん？',
+22:'出してくれ',
+23:'ゴースト',
+24:'頑張る',
+25:'陰湿なる',
+26:'不賛成',
+27:'賛成',
+28:'かかってこい',
+29:'またな！',
+30:'卒倒',
+31:'恐怖',
+32:'シーッ！',
+33:'こっちだ',
+34:'震え',
+35:'恥ずかしい',
+36:'これ、直さないとね',
+37:'こんにちは',
+38:'ブルーマルティンの挨拶',
+39:'派手に行こう',
+40:'答えを探している',
+41:'お知らせ',
+42:'いい品だ',
+43:'どいてくれ！',
+44:'タスクを受けた',
+45:'要リフィル',
+46:'遺恨',
+47:'熱烈',
+48:'目が回る',
+49:'へとへと',
+50:'栄光の重荷',
+51:'秘密',
+53:'貪欲',
+54:'栄光の重荷',
+55:'嘆願',
+57:'貪欲',
+58:'至高の道楽',
+59:'没頭',
+60:'やめておく',
+61:'動けない',
+62:'だめ',
+63:'どうでもいい',
+64:'欺瞞',
+65:'ゴールド',
+66:'卒倒',
+67:'恐怖',
+69:'戻った',
+70:'不滅',
+71:'飽食',
+72:'調べる',
+73:'拭き取る',
+74:'グータッチ',
+75:'怯え',
+76:'値踏み',
+77:'乾杯！',
+78:'うう！',
+79:'任せろ',
+80:'内なる平穏',
+81:'畜生',
+82:'助けて',
+83:'富を分け合う',
+84:'祓魔術',
+85:'お手上げ',
+86:'戦いの鳴き声',
+87:'懇願',
+88:'困惑',
+90:'貪欲',
+91:'栄光の重荷',
+92:'懇願',
+94:'こっちだ',
+95:'そうは思わない',
+96:'ナイスジョブ！',
+97:'がっかり',
+98:'シーズンの猶予',
+99:'不浄な憤怒',
+100: '隠れる',
+101:'私は大丈夫',
+102:'強いハグ',
+103:'極度の忍耐',
+108:'冒険へ！',
+109:'死',
+110:'聞こえない',
+111:'もう行かないと',
+112:'こっちに来てくれ',
+113:'喉が乾いた',
+114:'正義の憤怒',
+115:'進め！',
+117:'悪運',
+118:'アーケイン・アドバンテージ',
+120:'えっ！？',
+121:'悲哀',
+122:'拒絶',
+123:'口説く',
+124:'終わった！',
+125:'食べ過ぎ',
+126:'レジェンダリーハイプ',
+127:'死ね、虫けらめ！',
+128:'おっと',
+129:'臭うな',
+130:'誇らしげな母',
+131:'不満な父',
+137:'切望',
+138:'お母さん？',
+139:'ずっと一緒',
+140:'激しい怒り',
+141:'熟考',
+142:'専門外',
+143:'新着メール',
+144:'迷った',
+145:'キスを飛ばす',
+146:'準備は万全',
+147:'ストームレイジ',
+148:'遠い憧れ',
+149:'闇夜の遠吠え',
+150:'勝利の光',
+152:'内なる美',
+153:'すすり泣き',
+154:'悲しいかな',
+155:'お前だ！',
+156:'アライアンスのために',
+157:'ホードのために！',
+158:'トーレンの力',
+159:'考え直せ',
+160:'べったり',
+161:'うわさ話',
+162:'素晴らしい考え',
+163:'一緒に行こう',
+164:'長い一日',
+165:'情熱的な別れ',
+166:'今行く！',
+167:'狂気じみた笑い',
+169:'静穏',
+170:'激しい訓練',
+172:'来い！',
+173:'光の鷹',
+174:'月下の少年',
+175:'クラス変更',
+176:'つつく',
+177:'束の間の休息',
+178:'万事順調',
+179:'狂戦士',
+180:'よだれ',
+181:'ミー！',
+182:'不眠',
+183:'まだだ',
+184:'これは重要だ',
+185:'料理',
+187:'裏切り',
+188:'うっとり',
+189:'よだれ',
+190:'売却！',
+191:'よく休んだ',
+192:'高額入札',
+193:'現行犯',
+194:'計算済み',
+195:'フッ',
+196:'頑張れ',
+197:'踊り',
+198:'圧倒的な力',
+199:'感情的',
+200:'不眠',
+202:'我が友',
+219:'おおっと！',
+220:'横目で見る',
+221:'喜び',
+222:'興奮状態',
+223:'平手打ち',
+224:'敬礼',
+225:'今すぐこっちに来い',
+226:'いい度胸だ',
+227:'マジか？',
+228:'I cant look',
+229:'回復頼む',
+230:'驚き',
+239:'勝てるぞ！',
+240:'乾杯',
+241:'霊魂ファイア',
+242:'計画的',
+243:'傲慢',
+244:'それではまた',
+245:'会えてよかった',
+246:'行くな！',
+247:'弓',
+248:'くれるの？',
+249:'怯え',
+250:'圧力',
+251:'音もなく',
+252:'酔っ払い',
+253:'これにはまだ早すぎる',
+256:'怯え',
+257:'圧力',
+260:'肋骨砕き',
+261:'自業自得',
+262:'新品同様',
+263:'言い残すことは？',
+267:'今を捉える',
+268:'あなたに',
+269:'リップアンドティア',
+270:'準備万端',
+}
+
+# DB からデータ取得
+stamp_ranking = []
+text_ranking   = []
+
+if os.path.exists(DB_PATH):
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+
+    # 人気スタンプ（スタンプ単位）
+    cur.execute('''
+        SELECT stamp_id, COUNT(*) as cnt,
+               MAX(datetime) as last_used
+        FROM stamp_popular
+        GROUP BY stamp_id
+        ORDER BY cnt DESC, last_used DESC
+    ''')
+    stamp_ranking = cur.fetchall()
+
+    # 人気スタンプ×文字列
+    cur.execute('''
+        SELECT stamp_id, selected_text, COUNT(*) as cnt,
+               MAX(datetime) as last_used
+        FROM stamp_popular
+        GROUP BY stamp_id, selected_text
+        ORDER BY cnt DESC, last_used DESC
+    ''')
+    text_ranking = cur.fetchall()
+    conn.close()
+
+total_copies = sum(r['cnt'] for r in stamp_ranking)
+
+print("Content-Type: text/html; charset=utf-8")
+print()
+
+print(f'''<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Diablo Immortal - 人気スタンプランキング</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&display=swap');
+
+    *, *::before, *::after {{ box-sizing: border-box; margin: 0; padding: 0; }}
+
+    body {{
+      background-color: #0a0608;
+      background-image:
+        radial-gradient(ellipse at top, #1a0810 0%, #0a0608 60%),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='4' height='4' fill='%230a0608'/%3E%3Crect x='0' y='0' width='1' height='1' fill='%23110a0e' opacity='0.6'/%3E%3Crect x='2' y='2' width='1' height='1' fill='%23110a0e' opacity='0.4'/%3E%3C/svg%3E");
+      color: #c8a96e;
+      font-family: YJTop Ellipsis,ヒラギノ角ゴ ProN,Hiragino Kaku Gothic ProN,メイリオ,Meiryo,Osaka,ＭＳ Ｐゴシック,MS PGothic,sans-serif;
+      min-height: 100vh;
+      padding: 20px;
+    }}
+
+    header {{
+      text-align: center;
+      padding: 30px 10px 20px;
+    }}
+    header::before, header::after {{
+      content: '';
+      display: block;
+      height: 2px;
+      background: linear-gradient(to right, transparent, #8b1a1a, #c0392b, #e74c3c, #c0392b, #8b1a1a, transparent);
+      margin: 12px auto;
+      max-width: 800px;
+    }}
+    header h1 {{
+      font-family: 'Cinzel', serif;
+      font-size: clamp(1.2rem, 4vw, 2.2rem);
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      background: linear-gradient(180deg, #f5d76e 0%, #c8a030 40%, #a07020 70%, #e8c060 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 0 8px rgba(200,160,48,0.5));
+    }}
+    header .subtitle {{
+      font-size: 0.75rem;
+      color: #5a3a1a;
+      letter-spacing: 0.3em;
+      margin-top: 6px;
+      text-transform: uppercase;
+    }}
+    header .total {{
+      font-size: 0.75rem;
+      color: #7a5a2a;
+      margin-top: 4px;
+      letter-spacing: 0.15em;
+    }}
+    header .total span {{
+      color: #c0392b;
+      font-weight: 700;
+    }}
+
+    .back-link {{
+      display: inline-block;
+      margin: 0 0 16px 0;
+      font-size: 0.75rem;
+      color: #7a5a2a;
+      text-decoration: none;
+      letter-spacing: 0.1em;
+      border: 1px solid #3a1515;
+      padding: 4px 12px;
+      border-radius: 3px;
+      transition: color 0.15s, border-color 0.15s;
+    }}
+    .back-link:hover {{ color: #c8a96e; border-color: #c0392b; }}
+
+    .section {{
+      max-width: 900px;
+      margin: 24px auto 0;
+    }}
+    .section-title {{
+      font-family: 'Cinzel', serif;
+      font-size: clamp(0.85rem, 2.5vw, 1.1rem);
+      font-weight: 700;
+      color: #f5d76e;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      filter: drop-shadow(0 0 6px rgba(245,215,110,0.4));
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }}
+    .section-title::after {{
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to right, #8b1a1a, transparent);
+    }}
+
+    /* スタンプランキング */
+    .stamp-ranking {{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }}
+    .stamp-card {{
+      width: 100px;
+      background: rgba(10,4,8,0.8);
+      border: 1px solid #3a1515;
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 6px 4px 4px;
+      position: relative;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }}
+    .stamp-card:hover {{
+      border-color: #c0392b;
+      box-shadow: 0 0 10px rgba(192,57,43,0.4);
+    }}
+    .stamp-card .rank {{
+      position: absolute;
+      top: 3px;
+      left: 5px;
+      font-size: 14px;
+      color: #5a3a1a;
+      font-family: 'Cinzel', serif;
+    }}
+    .rank-1 {{ color: #f5d76e !important; font-weight: 700; }}
+    .rank-2 {{ color: #b0b8c0 !important; font-weight: 700; }}
+    .rank-3 {{ color: #c8813a !important; font-weight: 700; }}
+    .stamp-card img {{
+      width: 70px;
+      height: 70px;
+      object-fit: contain;
+    }}
+    .stamp-card .stamp-id {{
+      font-size: 11px;
+      color: #c8a96e;
+      margin-top: 2px;
+      font-weight: 700;
+    }}
+    .stamp-card .stamp-name {{
+      font-size: 12px;
+      color: #a07840;
+      margin-top: 1px;
+      text-align: center;
+      word-break: break-all;
+      line-height: 1.3;
+    }}
+    .stamp-card .stamp-cnt {{
+      margin-top: 4px;
+      font-size: 15px;
+      color: #c0392b;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }}
+    .stamp-card .stamp-cnt::before {{ content: '▶ '; font-size: 8px; }}
+
+    /* テキストランキング */
+    .text-ranking {{
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }}
+    .text-row {{
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(10,4,8,0.8);
+      border: 1px solid #3a1515;
+      border-radius: 4px;
+      padding: 6px 12px;
+      transition: border-color 0.15s;
+    }}
+    .text-row:hover {{ border-color: #c0392b; }}
+    .text-row .rank {{
+      font-size: 16px;
+      color: #5a3a1a;
+      font-family: 'Cinzel', serif;
+      min-width: 28px;
+      text-align: right;
+    }}
+    .text-row img {{
+      width: 40px;
+      height: 40px;
+      object-fit: contain;
+      flex-shrink: 0;
+    }}
+    .text-row .text-info {{
+      flex: 1;
+      min-width: 0;
+    }}
+    .text-row .text-str {{
+      font-size: 16px;
+      color: #c8a96e;
+      word-break: break-all;
+      line-height: 1.4;
+    }}
+    .text-row .text-meta {{
+      font-size: 15px;
+      color: #5a3a1a;
+      margin-top: 2px;
+    }}
+    .text-row .text-cnt {{
+      font-size: 16px;
+      color: #c0392b;
+      font-weight: 700;
+      min-width: 40px;
+      text-align: right;
+      flex-shrink: 0;
+    }}
+    .text-row .text-cnt::after {{ content: ' 回'; font-size: 10px; color: #5a3a1a; }}
+
+    .empty {{
+      text-align: center;
+      color: #3a2a10;
+      font-size: 0.8rem;
+      padding: 30px 0;
+      letter-spacing: 0.2em;
+    }}
+
+    footer {{
+      text-align: center;
+      padding: 30px 10px;
+      font-size: 0.6rem;
+      letter-spacing: 0.25em;
+      color: #3a1a0a;
+      text-transform: uppercase;
+    }}
+
+    ::-webkit-scrollbar {{ width: 6px; }}
+    ::-webkit-scrollbar-track {{ background: #0a0608; }}
+    ::-webkit-scrollbar-thumb {{ background: #5a1a1a; border-radius: 3px; }}
+  </style>
+</head>
+<body>
+
+<header>
+  <p class="subtitle">Sanctuary Analytics</p>
+  <h1>人気スタンプランキング</h1>
+  <p class="total">総コピー数: <span>{total_copies}</span> 回</p>
+</header>
+
+<div class="section">
+  <a class="back-link" href="/emoji.html">← スタンプ一覧に戻る</a>
+''')
+
+# ===== セクション1: 人気スタンプ（スタンプ単位）=====
+print('<div class="section-title">人気スタンプ</div>')
+
+if stamp_ranking:
+    print('<div class="stamp-ranking">')
+    for idx, row in enumerate(stamp_ranking, 1):
+        sid  = row['stamp_id']
+        cnt  = row['cnt']
+        name = STAMP_NAMES.get(sid, '')
+        rank_cls = f'rank-{idx}' if idx <= 3 else ''
+        print(f'''
+    <div class="stamp-card">
+      <span class="rank {rank_cls}">#{idx}</span>
+      <img src="/images/emoji/{sid}.png" alt="{sid}"
+           onerror="this.src='/images/emoji/noimage.png'">
+      <div class="stamp-id">{sid}</div>
+      <div class="stamp-name">{html.escape(name)}</div>
+      <div class="stamp-cnt">{cnt} 回</div>
+    </div>''')
+    print('</div>')
+else:
+    print('<div class="empty">データがありません</div>')
+
+# ===== セクション2: 人気スタンプ×文字列 =====
+print('''
+</div>
+<div class="section" style="margin-top:32px;">
+<div class="section-title">人気スタンプ（詳細）</div>
+''')
+
+if text_ranking:
+    print('<div class="text-ranking">')
+    for idx, row in enumerate(text_ranking, 1):
+        sid   = row['stamp_id']
+        txt   = row['selected_text']
+        cnt   = row['cnt']
+        last  = row['last_used']
+        name  = STAMP_NAMES.get(sid, '')
+        rank_cls = f'rank-{idx}' if idx <= 3 else ''
+        print(f'''
+    <div class="text-row">
+      <span class="rank {rank_cls}">#{idx}</span>
+      <img src="/images/emoji/{sid}.png" alt="{sid}"
+           onerror="this.src='/images/emoji/noimage.png'">
+      <div class="text-info">
+        <div class="text-str">{html.escape(txt)}</div>
+        <div class="text-meta">{html.escape(name) + ' / ' if name else ''}{last}</div>
+      </div>
+      <div class="text-cnt">{cnt}</div>
+    </div>''')
+    print('</div>')
+else:
+    print('<div class="empty">データがありません</div>')
+
+print('''
+</div>
+
+<footer>&copy; Blizzard Entertainment &mdash; Diablo Immortal</footer>
+</body>
+</html>''')
