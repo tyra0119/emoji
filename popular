@@ -465,7 +465,7 @@ print(f'''<!DOCTYPE html>
     }}
     .text-row .text-meta {{
       font-size: 20px;
-      color: #5a3a1a;
+      color: #a07840;
       margin-top: 2px;
     }}
     .text-row .text-cnt {{
