@@ -241,6 +241,30 @@
       cursor: not-allowed;
     }
 
+    #btn-poplar {
+      padding: 4px 12px;
+      background: transparent;
+      border: 1px solid #5a3a10;
+      border-radius: 3px;
+      color: #a07840;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s, background 0.15s;
+      white-space: nowrap;
+    }
+
+    #btn-poplar:hover:not(:disabled) {
+      border-color: #c8a96e;
+      color: #c8a96e;
+      background: rgba(200, 160, 48, 0.08);
+    }
+
+    #btn-poplar:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
     footer {
       text-align: center;
       padding: 30px 10px;
@@ -556,6 +580,7 @@
       </label>
     </div>
     <button id="btn-export">📥 XLS出力</button>
+    <button id="btn-poplar">人気</button>
   </div>
   <div class="gallery" id="gallery"></div>
 </div>
@@ -1093,6 +1118,11 @@
     }
   }
 
+  // ---- お気に入り ----
+  document.getElementById('btn-poplar').addEventListener('click', () => {
+    window.location.href = 'https://tyra.jp/di/popular';
+  });
+  
   // ---- XLS エクスポート (ExcelJS) ----
   document.getElementById('btn-export').addEventListener('click', async () => {
     const btnExport = document.getElementById('btn-export');
