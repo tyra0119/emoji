@@ -781,6 +781,8 @@
 199:'感情的',
 200:'不眠',
 202:'我が友',
+206:'停止',
+207:'こちらを確認',
 219:'おおっと！',
 220:'横目で見る',
 221:'喜び',
@@ -1124,7 +1126,12 @@
         img.src = '/images/emoji/noimage.png';
         img.className = 'img-main';
 
+        const noBadge = document.createElement('span');
+        noBadge.className = 'num-badge';
+        noBadge.textContent = i;
+
         wrapper.appendChild(img);
+        wrapper.appendChild(noBadge);
         wrapper.appendChild(num);
         wrapper.dataset.loaded  = '1';
         wrapper.dataset.noimage = '1';
